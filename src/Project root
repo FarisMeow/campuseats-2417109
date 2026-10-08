@@ -14,3 +14,23 @@ Add a new section every week, before you tag. Did not use AI? Write "None" under
 - What I asked for:
 - What I kept, changed or rejected, and why:
 - One thing the AI got wrong and how I fixed it:
+
+
+
+1. What is the difference between building a UI imperatively (plain DOM code) and declaratively (React)?
+
+-Imperative (Plain DOM): You manually tell the browser how to update the UI step by step.
+
+-Declarative (React): You describe what the UI should look like, and React automatically updates it when data changes.
+
+2. Why must a component name start with a capital letter?
+
+=React uses capital letters to distinguish custom components from normal HTML elements. For example, <Welcome /> is a React component, while <welcome /> is treated as an HTML tag.
+
+3. What does a fragment <>...</> do, and why not just use a <div>?
+
+=A fragment allows you to group multiple elements without adding an extra HTML element to the page. Unlike a <div>, it keeps the DOM structure cleaner and avoids unnecessary elements.
+
+4. Name one benefit of splitting the UI into small components.
+
+=Reusability: Small components can be reused in different parts of an application, making the code easier to maintain and reducing repetition.
