@@ -1,0 +1,111 @@
+
+[
+  {
+    "id": "2417109-campus-delight",
+    "name": "Campus Delight Cafe",
+    "location": "Mahallah Ali, Block C",
+    "openHours": "7:00 am - 10:00 pm",
+    "isOpen": true,
+    "menu": [
+      {
+        "id": "2417109-m1",
+        "name": "Nasi Lemak Ayam",
+        "description": "Coconut rice with fried chicken and sambal",
+        "price": 7.5,
+        "category": "Rice",
+        "popular": true,
+        "available": true
+      },
+      {
+        "id": "2417109-m2",
+        "name": "Nasi Goreng Kampung",
+        "description": "Traditional fried rice with egg",
+        "price": 6.5,
+        "category": "Rice",
+        "popular": true,
+        "available": true
+      },
+      {
+        "id": "2417109-m3",
+        "name": "Mee Goreng Mamak",
+        "description": "Fried noodles with vegetables",
+        "price": 6,
+        "category": "Noodles",
+        "popular": false,
+        "available": true
+      },
+      {
+        "id": "2417109-m4",
+        "name": "Kuey Teow Goreng",
+        "description": "Fried flat rice noodles",
+        "price": 7,
+        "category": "Noodles",
+        "popular": true,
+        "available": true
+      },
+      {
+        "id": "2417109-m5",
+        "name": "Teh Ais",
+        "description": "Iced milk tea",
+        "price": 2.5,
+        "category": "Drinks",
+        "popular": true,
+        "available": true
+      },
+      {
+        "id": "2417109-m6",
+        "name": "Milo Ais",
+        "description": "Iced chocolate malt drink",
+        "price": 3,
+        "category": "Drinks",
+        "popular": false,
+        "available": true
+      },
+      {
+        "id": "2417109-m7",
+        "name": "Roti Canai",
+        "description": "Flatbread served with dhal",
+        "price": 2,
+        "category": "Bread",
+        "popular": true,
+        "available": true
+      },
+      {
+        "id": "2417109-m8",
+        "name": "Roti Telur",
+        "description": "Flatbread with egg",
+        "price": 3,
+        "category": "Bread",
+        "popular": false,
+        "available": false
+      }
+    ]
+  },
+  {
+    "id": "2417109-kafe-aminah",
+    "name": "Kafe Mahallah Aminah",
+    "location": "Mahallah Aminah, Ground Floor",
+    "openHours": "8:00 am - 9:00 pm",
+    "isOpen": true,
+    "menu": [
+      {
+        "id": "2417109-a1",
+        "name": "Nasi Ayam Penyet",
+        "description": "Fried chicken with sambal and rice",
+        "price": 9,
+        "category": "Rice",
+        "popular": true,
+        "available": true
+      },
+      {
+        "id": "2417109-a2",
+        "name": "Air Bandung",
+        "description": "Rose syrup with milk",
+        "price": 3,
+        "category": "Drinks",
+        "popular": false,
+        "available": true
+      }
+    ]
+  }
+]

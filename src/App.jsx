@@ -1,37 +1,193 @@
 
-import { useState } from 'react'
-import vendors from './data/vendors.js'
+import { useEffect, useState } from 'react'
+
 import Header from './components/Header.jsx'
 import VendorCard from './components/VendorCard.jsx'
 import MenuList from './components/MenuList.jsx'
+import CartPage from './components/CartPage.jsx'
 import Footer from './components/Footer.jsx'
+import { Loading, ErrorMessage } from './components/Status.jsx'
 
 function App() {
 
-  // Remember which vendor is selected
-  const [selectedVendorId, setSelectedVendorId] = useState(vendors[0].id)
+  // S1: Eight pieces of state
+  const [vendors, setVendors] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
+  const [reloadKey, setReloadKey] = useState(0)
 
-  // Find the selected vendor
+  const [selectedVendorId, setSelectedVendorId] = useState(null)
+  const [cart, setCart] = useState([])
+  const [view, setView] = useState('menu')
+  const [lastOrder, setLastOrder] = useState(null)
+
+  // S2: Fetch vendors from JSON
+  useEffect(() => {
+    const controller = new AbortController()
+
+    setLoading(true)
+    setError(null)
+
+    fetch('/api/vendors.json', { signal: controller.signal })
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error(`HTTP ${res.status}`)
+        }
+
+        return res.json()
+      })
+      .then((data) => {
+        if (controller.signal.aborted) return
+
+        setVendors(data)
+
+        setSelectedVendorId((current) =>
+          data.some((v) => v.id === current)
+            ? current
+            : data[0]?.id ?? null
+        )
+      })
+      .catch((err) => {
+        if (err.name !== 'AbortError') {
+          setError(err.message)
+        }
+      })
+      .finally(() => {
+        if (!controller.signal.aborted) {
+          setLoading(false)
+        }
+      })
+
+    return () => controller.abort()
+  }, [reloadKey])
+
+  // Find selected vendor
   const selectedVendor = vendors.find(
-    (vendor) => vendor.id === selectedVendorId
+    (v) => v.id === selectedVendorId
   )
 
-  // Store items added to the cart
-  const [cart, setCart] = useState([])
-
-  // Add an item to the cart
+  // S3: Add item to cart
   function handleAddToCart(item) {
-    setCart((prevCart) => [...prevCart, item])
+    setCart((prev) => {
+      const existing = prev.find(
+        (line) => line.item.id === item.id
+      )
+
+      if (existing) {
+        return prev.map((line) =>
+          line.item.id === item.id
+            ? { ...line, qty: line.qty + 1 }
+            : line
+        )
+      }
+
+      return [...prev, { item, qty: 1 }]
+    })
   }
 
-  return (
-    <>
-      <Header cartCount={cart.length} />
+  // Increase or decrease quantity
+  function handleChangeQty(itemId, delta) {
+    setCart((prev) =>
+      prev
+        .map((line) =>
+          line.item.id === itemId
+            ? { ...line, qty: line.qty + delta }
+            : line
+        )
+        .filter((line) => line.qty > 0)
+    )
+  }
 
-      <main className="container">
+  // Remove item from cart
+  function handleRemove(itemId) {
+    setCart((prev) =>
+      prev.filter((line) => line.item.id !== itemId)
+    )
+  }
 
+  // Calculate total cart quantity
+  const cartCount = cart.reduce(
+    (sum, line) => sum + line.qty,
+    0
+  )
+
+  // Place order
+  function handlePlaceOrder(details) {
+    const total = cart.reduce(
+      (sum, line) => sum + line.item.price * line.qty,
+      0
+    )
+
+    setLastOrder({ ...details, total })
+    setCart([])
+    setView('done')
+  }
+
+  // S4: Display the correct page
+  let content
+
+  if (view === 'cart') {
+    content = (
+      <CartPage
+        cart={cart}
+        onChangeQty={handleChangeQty}
+        onRemove={handleRemove}
+        onPlaceOrder={handlePlaceOrder}
+      />
+    )
+
+  } else if (view === 'done') {
+    content = (
+      <section className="card">
+        <h2>Order placed!</h2>
+
+        <p>
+          Thank you, {lastOrder?.name}.
+        </p>
+
+        <p>
+          Pickup time: {lastOrder?.pickupTime}
+        </p>
+
+        <p>
+          Mahallah: {lastOrder?.mahallah}
+        </p>
+
+        <p>
+          Total: RM {lastOrder?.total.toFixed(2)}
+        </p>
+
+        <button
+          className="btn"
+          onClick={() => setView('menu')}
+        >
+          Back to menus
+        </button>
+      </section>
+    )
+
+  } else if (loading) {
+    content = <Loading />
+
+  } else if (error) {
+    content = (
+      <ErrorMessage
+        message={error}
+        onRetry={() => {
+          setLoading(true)
+          setError(null)
+          setReloadKey((k) => k + 1)
+        }}
+      />
+    )
+
+  } else {
+    content = (
+      <>
         <section>
-          <h2 className="section-title">Choose a vendor</h2>
+          <h2 className="section-title">
+            Choose a vendor
+          </h2>
 
           <div className="vendor-grid">
             {vendors.map((vendor) => (
@@ -45,17 +201,32 @@ function App() {
           </div>
         </section>
 
-        <section>
-          <h2 className="section-title">
-            Menu: {selectedVendor.name}
-          </h2>
+        {selectedVendor && (
+          <section>
+            <h2 className="section-title">
+              Menu: {selectedVendor.name}
+            </h2>
 
-          <MenuList
-            items={selectedVendor.menu}
-            onAdd={handleAddToCart}
-          />
-        </section>
+            <MenuList
+              items={selectedVendor.menu}
+              onAdd={handleAddToCart}
+            />
+          </section>
+        )}
+      </>
+    )
+  }
 
+  return (
+    <>
+      <Header
+        cartCount={cartCount}
+        onShowMenu={() => setView('menu')}
+        onShowCart={() => setView('cart')}
+      />
+
+      <main className="container">
+        {content}
       </main>
 
       <Footer />
