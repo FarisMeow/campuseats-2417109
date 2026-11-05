@@ -6,11 +6,13 @@ import VendorCard from './components/VendorCard.jsx'
 import MenuList from './components/MenuList.jsx'
 import CartPage from './components/CartPage.jsx'
 import Footer from './components/Footer.jsx'
+import OrderHistory from './components/OrderHistory.jsx'
 import { Loading, ErrorMessage } from './components/Status.jsx'
+import { useLocalStorage } from './hooks/useLocalStorage.js'
 
 function App() {
 
-  // S1: Eight pieces of state
+  // Store application data
   const [vendors, setVendors] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
@@ -21,7 +23,10 @@ function App() {
   const [view, setView] = useState('menu')
   const [lastOrder, setLastOrder] = useState(null)
 
-  // S2: Fetch vendors from JSON
+  // Save order history in localStorage
+  const [orders, setOrders] = useLocalStorage('campuseats-orders', [])
+
+  // Fetch vendors from JSON
   useEffect(() => {
     const controller = new AbortController()
 
@@ -66,7 +71,7 @@ function App() {
     (v) => v.id === selectedVendorId
   )
 
-  // S3: Add item to cart
+  // Add item to cart
   function handleAddToCart(item) {
     setCart((prev) => {
       const existing = prev.find(
@@ -111,22 +116,44 @@ function App() {
     0
   )
 
-  // Place order
+  // Place order and save order history
   function handlePlaceOrder(details) {
     const total = cart.reduce(
       (sum, line) => sum + line.item.price * line.qty,
       0
     )
 
-    setLastOrder({ ...details, total })
+    const order = {
+      id: `ord-${Date.now()}`,
+      createdAt: new Date().toISOString(),
+      ...details,
+      lines: cart.map((line) => ({
+        ...line,
+        item: { ...line.item }
+      })),
+      total
+    }
+
+    // Save completed order
+    setOrders((prev) => [order, ...prev])
+
+    // Display order confirmation
+    setLastOrder(order)
+
+    // Clear cart
     setCart([])
+
+    // Navigate to confirmation page
     setView('done')
   }
 
-  // S4: Display the correct page
+  // Display the correct page
   let content
 
-  if (view === 'cart') {
+  if (view === 'history') {
+    content = <OrderHistory orders={orders} />
+
+  } else if (view === 'cart') {
     content = (
       <CartPage
         cart={cart}
@@ -223,6 +250,7 @@ function App() {
         cartCount={cartCount}
         onShowMenu={() => setView('menu')}
         onShowCart={() => setView('cart')}
+        onShowHistory={() => setView('history')}
       />
 
       <main className="container">

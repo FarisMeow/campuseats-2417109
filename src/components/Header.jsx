@@ -1,5 +1,10 @@
 
-function Header({ cartCount, onShowMenu, onShowCart }) {
+function Header({
+  cartCount,
+  onShowMenu,
+  onShowCart,
+  onShowHistory
+}) {
   return (
     <header className="header">
       <h1 className="logo">CampusEats</h1>
@@ -19,6 +24,14 @@ function Header({ cartCount, onShowMenu, onShowCart }) {
           onClick={onShowCart}
         >
           Cart <span className="badge">{cartCount}</span>
+        </button>
+
+        <button
+          type="button"
+          className="link"
+          onClick={onShowHistory}
+        >
+          Order History
         </button>
       </nav>
     </header>

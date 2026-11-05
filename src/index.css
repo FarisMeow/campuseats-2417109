@@ -210,3 +210,17 @@ button.card:hover {
 .error {
   border-left: 4px solid #b3261e;
 }
+.history-list {
+  display: grid;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.history-list .card {
+  padding: 20px;
+  border: 1px solid #ddd;
+}
+
+.history-list li {
+  margin-bottom: 8px;
+}
